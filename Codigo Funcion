@@ -1,0 +1,25 @@
+DELIMITER $$
+
+CREATE FUNCTION ObtenerActividadesUsuario(
+    p_IdUsuario INT,
+    p_Fecha DATE
+)
+RETURNS TEXT DETERMINISTIC
+BEGIN
+    DECLARE resultado TEXT DEFAULT '';
+
+    -- Concatenar todas las actividades en una sola cadena de texto
+    SELECT GROUP_CONCAT(A.Nombre SEPARATOR ', ') INTO resultado
+    FROM Planificador P
+    JOIN Actividades A ON P.IdActividad = A.IdActividades
+    WHERE P.IdUsuario = p_IdUsuario
+    AND DATE(A.Fecha_inicio) = p_Fecha;
+
+    -- Devolver las actividades o un mensaje si no hay ninguna
+    RETURN IFNULL(resultado, 'No hay actividades planificadas.');
+END $$
+
+DELIMITER ;
+
+  -- Llamar funcion
+SELECT ObtenerActividadesUsuario(1, '2025-03-07');
